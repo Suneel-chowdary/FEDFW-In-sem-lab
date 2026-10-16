@@ -1,0 +1,166 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User - Online Courses</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f2f6ff;
+            margin: 0;
+        }
+
+        header {
+            background: #173b78;
+            color: white;
+            text-align: center;
+            padding: 20px;
+        }
+
+        nav {
+            background: #102c59;
+            padding: 15px;
+            text-align: center;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            margin: 15px;
+        }
+
+        .container {
+            max-width: 700px;
+            margin: 30px auto;
+            padding: 25px;
+            background: white;
+            border-radius: 10px;
+        }
+
+        .course {
+            background: #e8efff;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 8px;
+        }
+
+        button {
+            background: #2563eb;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:disabled {
+            background: #777;
+            cursor: default;
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <h1>User Dashboard</h1>
+    <p>Explore and Enroll in Courses</p>
+</header>
+
+<nav>
+    <a href="index.html">Home</a>
+    <a href="admin.html">Admin</a>
+    <a href="user.html">User</a>
+</nav>
+
+<div class="container">
+    <h2>Available Courses</h2>
+    <div id="courseList"></div>
+
+    <h2>My Enrolled Courses</h2>
+    <ul id="enrolledList"></ul>
+
+    <a href="index.html">Back to Home</a>
+</div>
+
+<script>
+    let courses = JSON.parse(
+        localStorage.getItem("courses") || "[]"
+    );
+
+    let enrolled = JSON.parse(
+        localStorage.getItem("enrolledCourses") || "[]"
+    );
+
+    function displayCourses() {
+        const list = document.getElementById("courseList");
+        list.innerHTML = "";
+
+        if (courses.length === 0) {
+            list.textContent = "No courses available. Please check later.";
+            return;
+        }
+
+        courses.forEach((course, index) => {
+            const div = document.createElement("div");
+            div.className = "course";
+
+            const title = document.createElement("h3");
+            title.textContent = course.name;
+
+            const details = document.createElement("p");
+            details.textContent =
+                "Instructor: " + course.instructor +
+                " | Duration: " + course.duration + " weeks";
+
+            const btn = document.createElement("button");
+            const alreadyEnrolled = enrolled.includes(course.name);
+
+            btn.textContent = alreadyEnrolled ? "Enrolled" : "Enroll Now";
+            btn.disabled = alreadyEnrolled;
+
+            btn.onclick = function () {
+                if (!enrolled.includes(course.name)) {
+                    enrolled.push(course.name);
+                    localStorage.setItem(
+                        "enrolledCourses",
+                        JSON.stringify(enrolled)
+                    );
+
+                    displayCourses();
+                    displayEnrolled();
+
+                    alert("Enrolled successfully!");
+                }
+            };
+
+            div.append(title, details, btn);
+            list.appendChild(div);
+        });
+    }
+
+    function displayEnrolled() {
+        const list = document.getElementById("enrolledList");
+        list.innerHTML = "";
+
+        if (enrolled.length === 0) {
+            list.innerHTML = "<li>You have not enrolled in any courses.</li>";
+            return;
+        }
+
+        enrolled.forEach(name => {
+            const li = document.createElement("li");
+            li.textContent = name;
+            list.appendChild(li);
+        });
+    }
+
+    displayCourses();
+    displayEnrolled();
+</script>
+
+</body>
+</html>

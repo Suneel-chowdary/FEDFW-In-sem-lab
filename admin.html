@@ -1,0 +1,178 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Course Management</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f2f6ff;
+            margin: 0;
+        }
+
+        header {
+            background: #173b78;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        nav {
+            background: #102c59;
+            padding: 15px;
+            text-align: center;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            margin: 15px;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 30px auto;
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px #ccc;
+        }
+
+        input, button {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            box-sizing: border-box;
+        }
+
+        button {
+            background: #2563eb;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        .delete {
+            background: #dc2626;
+        }
+
+        li {
+            margin: 12px 0;
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <h1>Admin Dashboard</h1>
+    <p>Manage Online Courses</p>
+</header>
+
+<nav>
+    <a href="index.html">Home</a>
+    <a href="admin.html">Admin</a>
+    <a href="user.html">User</a>
+</nav>
+
+<div class="container">
+    <h2>Add New Course</h2>
+
+    <form id="courseForm">
+        <input type="text" id="courseName"
+               placeholder="Enter course name" required>
+
+        <input type="text" id="instructor"
+               placeholder="Enter instructor name" required>
+
+        <input type="number" id="duration"
+               placeholder="Duration in weeks"
+               min="1" required>
+
+        <button type="submit">Add Course</button>
+    </form>
+
+    <h2>Available Courses</h2>
+    <ul id="courseList"></ul>
+
+    <a href="index.html">Back to Home</a>
+</div>
+
+<script>
+    let courses = JSON.parse(
+        localStorage.getItem("courses") || "[]"
+    );
+
+    function displayCourses() {
+        const list = document.getElementById("courseList");
+        list.innerHTML = "";
+
+        if (courses.length === 0) {
+            list.innerHTML = "<li>No courses available.</li>";
+            return;
+        }
+
+        courses.forEach((course, index) => {
+            const li = document.createElement("li");
+
+            li.append(
+                document.createTextNode(
+                    course.name + " - " +
+                    course.instructor + " - " +
+                    course.duration + " weeks "
+                )
+            );
+
+            const btn = document.createElement("button");
+            btn.textContent = "Delete";
+            btn.className = "delete";
+            btn.onclick = function () {
+                courses.splice(index, 1);
+                saveCourses();
+            };
+
+            li.appendChild(btn);
+            list.appendChild(li);
+        });
+    }
+
+    function saveCourses() {
+        localStorage.setItem("courses", JSON.stringify(courses));
+        displayCourses();
+    }
+
+    document.getElementById("courseForm").addEventListener(
+        "submit", function (event) {
+            event.preventDefault();
+
+            const name = document.getElementById("courseName").value.trim();
+            const instructor = document.getElementById("instructor").value.trim();
+            const duration = document.getElementById("duration").value;
+
+            if (!name || !instructor || Number(duration) < 1) {
+                alert("Please enter valid course details.");
+                return;
+            }
+
+            courses.push({
+                name: name,
+                instructor: instructor,
+                duration: duration
+            });
+
+            saveCourses();
+            this.reset();
+
+            alert("Course added successfully!");
+        }
+    );
+
+    displayCourses();
+</script>
+
+</body>
+</html>
